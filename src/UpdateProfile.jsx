@@ -1,16 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+function UpdateProfile({ user, setUser }) {
+  const [formData, setFormData] = useState({
+    username: user.username,
+    email: user.email,
+  });
 
-function CreateProfile({ setUser }) {
-  const [formData, setFormData] = useState({ username: "", email: "" });
+  useEffect(() => {
+    if (user.username) {
+      document.title = `${user.username} : Update profile`;
+    }
+  }, [user.username]);
+
+  useEffect(() => {
+    async function loadUsers() {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${user.id}`
+      );
+      const userFromAPI = await response.json();
+      setUser(userFromAPI);
+      setFormData(userFromAPI);
+    }
+
+    loadUsers();
+  }, [user.id, setUser]); // Passing [] so that it only runs the effect once
+
+  const handleChange = (event) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
 
     try {
       const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users",
+        `https://jsonplaceholder.typicode.com/users/${user.id}`,
         {
-          method: "POST",
+          method: "PUT",
           body: JSON.stringify(formData),
           headers: {
             "Content-type": "application/json;charset=UTF-8",
@@ -26,13 +51,13 @@ function CreateProfile({ setUser }) {
     }
   };
 
-  const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
-  };
+  if (!user.username || !user.email) {
+    return "Loading...";
+  }
 
   return (
     <>
-      <h2 className="pb-3">Create a profile</h2>
+      <h2 className="pb-3">Update your profile</h2>
       <form name="profileCreate" onSubmit={onSubmit}>
         <section className="mb-3">
           <label htmlFor="username" className="form-label">
@@ -69,4 +94,4 @@ function CreateProfile({ setUser }) {
   );
 }
 
-export default CreateProfile;
+export default UpdateProfile;

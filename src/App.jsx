@@ -1,8 +1,9 @@
 import { useState } from "react";
 import CreateProfile from "./CreateProfile";
+import UpdateProfile from "./UpdateProfile";
 
 function App() {
-  const [user, setUser] = useState({ id: null, username: "", email: "" });
+  const [user, setUser] = useState({ id: 4, username: "", email: "" });
 
   return (
     <>
@@ -12,7 +13,11 @@ function App() {
         </h1>
       </header>
       <main className="w-25 mx-auto my-5">
-        <CreateProfile setUser={setUser} />
+        {user.id ? (
+          <UpdateProfile user={user} setUser={setUser} />
+        ) : (
+          <CreateProfile setUser={setUser} />
+        )}
       </main>
     </>
   );
